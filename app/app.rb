@@ -7,11 +7,10 @@ class Name
   include Redis::Objects
   def id
     #human readable word IS 'primary' key
-    "Name"
+    [*('A'..'Z')].sample(8).join
   end
-
-  def hash_point
-  end
+  # Name.redis.sadd("hash_point:a2c6471b20151256fe41d784631f4fbe", name.id)
+  value :hash_point
 end
 
 class HashPoint
@@ -20,8 +19,7 @@ class HashPoint
     SecureRandom.hex
   end
   # should claim a Name
-  def claims
-  end
+  value :claim
   # increment claimers
   # ?
 end
@@ -38,6 +36,6 @@ end
 
 module Resolver
   def self.name_from(hash)
-    Name.find_by_hash_point(hash)
+    Name.redis.smembers("hash_point:#{hash}")
   end
 end
