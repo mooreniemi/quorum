@@ -5,6 +5,13 @@ Redis.current = Redis.new(:host => '127.0.0.1', :port => 6379)
 
 class Name
   include Redis::Objects
+  def id
+    #human readable word IS 'primary' key
+    "Name"
+  end
+
+  def hash_point
+  end
 end
 
 class HashPoint
@@ -12,6 +19,11 @@ class HashPoint
   def id
     SecureRandom.hex
   end
+  # should claim a Name
+  def claims
+  end
+  # increment claimers
+  # ?
 end
 
 post '/h/new' do
@@ -21,9 +33,11 @@ post '/h/new' do
 end
 
 get '/h/:hash' do |hash|
-  "#{name_from(hash)} is name"
+  "#{Resolver.name_from(hash)} is name"
 end
 
-def name_from(hash)
-  "name"
+module Resolver
+  def self.name_from(hash)
+    Name.find_by_hash_point(hash)
+  end
 end
