@@ -3,6 +3,19 @@ require 'securerandom'
 
 Redis.current = Redis.new(:host => '127.0.0.1', :port => 6379)
 
+class NameSpace
+  attr_accessor :name
+  def initialize(name = nil)
+    @name = name
+  end
+  def attach(hashpoint)
+    Redis.current.sadd(name, hashpoint.id)
+  end
+  def attached
+    Redis.current.smembers(name)
+  end
+end
+
 class Name
   include Redis::Objects
   def id
