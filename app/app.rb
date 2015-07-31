@@ -21,14 +21,10 @@ end
 
 class Name
   include Virtus.model
-  attr_accessor :on_store
-  def initialize(attributes = {})
-    super
-    @on_store = Redis::Value.new(id, marshal: true)
-  end
+  include Redis::Objects
   attribute :id, String, default: lambda {|instance, attribute| "#{instance.class.name.downcase}:#{attribute.name}:#{[*('A'..'Z')].sample(8).join}"}
   def save
-    on_store.value = attributes
+    redis.set(id, attributes)
   end
 end
 
