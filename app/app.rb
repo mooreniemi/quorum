@@ -16,6 +16,7 @@ class NameSpace
 
   def attach(hashpoint)
     Redis.current.sadd(name, hashpoint.id)
+    Redis.current.setnx("_hpoint:#{hashpoint.id}", name)
   end
 
   def attached

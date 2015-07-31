@@ -18,7 +18,7 @@ describe 'app' do
   end
   describe 'resolving' do
     it 'can get a name from a hashpoint' do
-      Redis.current.setnx("_hpoint:#{@hpoint.id}", @name.id)
+      @space.attach(@hpoint)
       assert_equal @name.id, Resolver.name_from(@hpoint)
     end
   end
