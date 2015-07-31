@@ -8,7 +8,7 @@ describe 'app' do
   before do
     @name = Name.new
     @hpoint = HashPoint.new
-    @space = NameSpace.new(@name)
+    @space = NameSpace.new(name: @name)
   end
   describe 'persisting' do
     it 'can access redis' do

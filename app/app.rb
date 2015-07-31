@@ -6,24 +6,6 @@ require 'active_support'
 
 Redis.current = Redis.new(:host => '127.0.0.1', :port => 6379)
 
-class NameSpace
-  include Virtus.model
-  attr_accessor :name
-
-  def initialize(name = nil)
-    @name = name.id
-  end
-
-  def attach(hashpoint)
-    Redis.current.sadd(name, hashpoint.id)
-    Redis.current.setnx("_hpoint:#{hashpoint.id}", name)
-  end
-
-  def attached
-    Redis.current.smembers(name)
-  end
-end
-
 class Name
   include Virtus.model
   include Redis::Objects
@@ -45,6 +27,21 @@ class HashPoint
   include Redis::Objects
 
   attribute :id, String, default: proc { "hpoint:#{SecureRandom.hex}" }
+end
+
+class NameSpace
+  include Virtus.model
+
+  attribute :name, ::Name
+
+  def attach(hashpoint)
+    Redis.current.sadd(name.id, hashpoint.id)
+    Redis.current.setnx("_hpoint:#{hashpoint.id}", name.id)
+  end
+
+  def attached
+    Redis.current.smembers(name.id)
+  end
 end
 
 post '/h/new' do
