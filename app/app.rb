@@ -2,18 +2,22 @@ require 'sinatra'
 require 'securerandom'
 require 'redis-objects'
 require 'virtus'
+require 'active_support'
 
 Redis.current = Redis.new(:host => '127.0.0.1', :port => 6379)
 
 class NameSpace
   include Virtus.model
   attr_accessor :name
+
   def initialize(name = nil)
     @name = name.id
   end
+
   def attach(hashpoint)
     Redis.current.sadd(name, hashpoint.id)
   end
+
   def attached
     Redis.current.smembers(name)
   end
@@ -22,15 +26,23 @@ end
 class Name
   include Virtus.model
   include Redis::Objects
-  attribute :id, String, default: lambda {|instance, attribute| "#{instance.class.name.downcase}:#{attribute.name}:#{[*('A'..'Z')].sample(8).join}"}
+
+  attribute :id, String, default: :unique_name
+  attribute :hpoint, String
+
   def save
-    redis.set(id, attributes)
+    redis.set(id, attributes.except(:id))
+  end
+
+  def unique_name
+    "name:#{[*('A'..'Z')].sample(8).join}"
   end
 end
 
 class HashPoint
   include Virtus.model
   include Redis::Objects
+
   attribute :id, String, default: proc { "hpoint:#{SecureRandom.hex}" }
 end
 
