@@ -20,7 +20,7 @@ class Name
   include Redis::Objects
   def id
     #human readable word IS 'primary' key
-    @id ||= [*('A'..'Z')].sample(8).join
+    @id ||= "name:#{[*('A'..'Z')].sample(8).join}"
   end
   value :hash_point
 end
@@ -28,7 +28,7 @@ end
 class HashPoint
   include Redis::Objects
   def id
-    @id ||= SecureRandom.hex
+    @id ||= "hpoint:#{SecureRandom.hex}"
   end
   # should claim a Name
   value :claim
@@ -47,6 +47,7 @@ get '/h/:hash' do |hash|
 end
 
 module Resolver
-  def self.name_from(hash)
+  def self.name_from(hpoint)
+    Redis.current.get("_hpoint:#{hpoint.id}")
   end
 end
