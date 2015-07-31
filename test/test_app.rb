@@ -10,23 +10,27 @@ describe 'app' do
     @hpoint = HashPoint.new
     @space = NameSpace.new(name: @name)
   end
-  describe 'persisting' do
-    it 'can access redis' do
-      @space.attach(@hpoint)
-      assert_includes @space.attached, @hpoint.id
+
+  describe NameSpace do
+    describe 'persisting' do
+      it 'can access redis' do
+        @space.attach(@hpoint)
+        assert_includes @space.attached, @hpoint.id
+      end
+    end
+    describe 'resolving' do
+      it 'can get a name from a hashpoint' do
+        @space.attach(@hpoint)
+        assert_equal @name.id, Resolver.name_from(@hpoint)
+      end
     end
   end
-  describe 'resolving' do
-    it 'can get a name from a hashpoint' do
-      @space.attach(@hpoint)
-      assert_equal @name.id, Resolver.name_from(@hpoint)
+
+  describe Name do
+    it 'sets id on initialization' do
+      name = Name.new
+      assert_kind_of String, name.id
     end
   end
 end
 
-describe Name do
-  it 'sets id on initialization' do
-    name = Name.new
-    assert_kind_of String, name.id
-  end
-end
