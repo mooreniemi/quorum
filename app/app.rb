@@ -6,7 +6,7 @@ Redis.current = Redis.new(:host => '127.0.0.1', :port => 6379)
 class NameSpace
   attr_accessor :name
   def initialize(name = nil)
-    @name = name
+    @name = name.id
   end
   def attach(hashpoint)
     Redis.current.sadd(name, hashpoint.id)
@@ -22,7 +22,6 @@ class Name
     #human readable word IS 'primary' key
     @id ||= [*('A'..'Z')].sample(8).join
   end
-  # Name.redis.sadd("hash_point:a2c6471b20151256fe41d784631f4fbe", name.id)
   value :hash_point
 end
 
@@ -49,6 +48,5 @@ end
 
 module Resolver
   def self.name_from(hash)
-    Name.redis.smembers("hash_point:#{hash}")
   end
 end
