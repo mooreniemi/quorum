@@ -29,13 +29,7 @@ end
 class HashPoint
   include Virtus.model
   include Redis::Objects
-  def id
-    @id ||= "hpoint:#{SecureRandom.hex}"
-  end
-  # should claim a Name
-  value :claim
-  # increment claimers
-  # ?
+  attribute :id, String, default: proc { "hpoint:#{SecureRandom.hex}" }
 end
 
 post '/h/new' do
