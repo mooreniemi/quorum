@@ -88,6 +88,3 @@ DEPENDENCIES
   sinatra
   thin
   virtus
-
-BUNDLED WITH
-   1.10.6

@@ -21,9 +21,15 @@ end
 
 class Name
   include Virtus.model
-  include Redis::Objects
+  attr_accessor :on_store
+  def initialize(attributes = {})
+    super
+    @on_store = Redis::Value.new(id, marshal: true)
+  end
   attribute :id, String, default: lambda {|instance, attribute| "#{instance.class.name.downcase}:#{attribute.name}:#{[*('A'..'Z')].sample(8).join}"}
-  value :hash_point
+  def save
+    on_store.value = attributes
+  end
 end
 
 class HashPoint
