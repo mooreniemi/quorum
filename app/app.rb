@@ -1,9 +1,12 @@
 require 'sinatra'
 require 'securerandom'
+require 'redis-objects'
+require 'virtus'
 
 Redis.current = Redis.new(:host => '127.0.0.1', :port => 6379)
 
 class NameSpace
+  include Virtus.model
   attr_accessor :name
   def initialize(name = nil)
     @name = name.id
@@ -17,15 +20,14 @@ class NameSpace
 end
 
 class Name
+  include Virtus.model
   include Redis::Objects
-  def id
-    #human readable word IS 'primary' key
-    @id ||= "name:#{[*('A'..'Z')].sample(8).join}"
-  end
+  attribute :id, String, default: lambda {|instance, attribute| "#{instance.class.name.downcase}:#{attribute.name}:#{[*('A'..'Z')].sample(8).join}"}
   value :hash_point
 end
 
 class HashPoint
+  include Virtus.model
   include Redis::Objects
   def id
     @id ||= "hpoint:#{SecureRandom.hex}"
